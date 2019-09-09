@@ -1,0 +1,118 @@
+---
+# tasks file for mysql_wordpress
+
+- name: install mysql repo
+  yum: name=http://repo.mysql.com/yum/mysql-5.5-community/el/6/x86_64/mysql-community-release-el6-5.noarch.rpm state=installed
+
+- name: install mysql 5.6 and requireds
+  yum: name={{ item }}
+       state=installed
+  with_items:
+   - mysql-community-server
+   - mysql-community-client
+   - mysql-community-libs
+   - mysql-community-libs-compat
+   - libaio
+   - mysql-community-common
+   - numactl
+
+- name: install mysql-python
+  yum: name=MySQL-python state=installed
+
+- name: Start mysqld
+  command: service mysqld start
+
+- name: Enable mysqld
+  command: /sbin/chkconfig mysqld on
+
+- name: Root pass
+  command: mysqladmin -u root password '{{ mysql_root_password }}'  
+  ignore_errors: True
+
+##############################
+########### For Secure #####
+###########################
+
+- name:  Delete Anonymous MYSQL Server User in For localhost
+  action: mysql_user user="" state="absent" check_implicit_admin=yes login_user=root login_password='{{ mysql_root_password }}'
+
+- name: remove the MySQL test database
+  action: mysql_db db=test state=absent login_user=root login_password='{{ mysql_root_password }}'
+  ignore_errors: True
+
+########################################################
+########################### WORDPRESS ##################
+#######################################################
+
+- name: mkdir /var/www
+  command: mkdir /var/www
+  ignore_errors: True
+
+- name: mkdir {{ www }}
+  command: mkdir {{ www }}
+  ignore_errors: True
+
+- name: Download Wordpress
+  get_url: url=https://wordpress.org/latest.tar.gz dest={{ www }}
+
+- name: tar wordpress
+  command: tar zxvf /var/www/html/latest.tar.gz -C {{ www }}
+
+- name: rm tar.gz
+  command: rm {{ www }}/latest.tar.gz -f
+
+- name: Add group "wordpress"
+  group: name=wordpress
+
+- name: Add User "wordpress"
+  user: name=wordpress group=wordpress home={{ www_wordpress }} password={{ wordpress_user_password }}
+
+############### SFTP ###########
+
+- name: replace one sftp line
+  replace: dest=/etc/ssh/sshd_config regexp="Subsystem" replace="#Subsystem"
+
+- name: Set some sftp lines in sshd config
+  lineinfile:
+   dest: /etc/ssh/sshd_config
+   line: "{{ item }}"
+  with_items:
+   - Subsystem sftp internal-sftp
+   - Match Group wordpress
+   - X11Forwarding no
+   - AllowTcpForwarding no
+   - ChrootDirectory /var/www/html
+   - ForceCommand internal-sftp
+
+- name: Restart sshd
+  command: service sshd restart
+
+- name: Enable sshd
+  command: /sbin/chkconfig sshd on
+
+- name: Salts for Wordpress
+  command: curl https://api.wordpress.org/secret-key/1.1/salt/
+  delegate_to: localhost
+  register: "wp_salt"
+
+- name: Create database for wordpress
+  mysql_db: db={{ mysql_dbname }} state=present encoding=utf8 login_user=root login_password='{{ mysql_root_password }}'
+
+- name: Create Wordpress database User
+  mysql_user: 
+   name={{ mysql_dbuser }}
+   password="{{ mysql_dbpass }}"
+   priv={{ mysql_dbname }}.*:ALL
+   state=present
+   host=localhost
+   login_user=root
+   login_password='{{ mysql_root_password }}'
+
+- name: Copy Wordpress config 
+  template: src=wp-config.php dest={{ www_wordpress }}
+
+- name: Change ownership of Wordpress 
+  file: path={{ www_wordpress }} owner=wordpress group=wordpress state=directory recurse=yes
+
+- name: Restart mysqld
+  command: service mysqld restart

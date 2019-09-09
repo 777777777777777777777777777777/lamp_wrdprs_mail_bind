@@ -1,0 +1,12 @@
+---
+- name: Configuration lamp_wrdprs_mail_bind centos6.10
+  hosts: all
+  roles:
+    - bind
+    - mysql_wordpress
+    - apache_nginx_php_phpmyadmin
+    - sendmail_dovecot
+    - iptables
+...
+
+

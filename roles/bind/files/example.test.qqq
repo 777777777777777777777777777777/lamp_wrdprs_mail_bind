@@ -1,0 +1,16 @@
+$TTL 1800
+@                      IN SOA example.test.qqq. admin.exampletest.qqq. (
+        2019180801 ;Serial 'YYMMDDxx'
+        3600 ;Refresh 24 hours
+        3600 ;Retry 2 hour
+        86400 ;Expire 7 days
+        1800 ) ;Minimum TTL 24 hours
+;
+; NS Records
+;
+                       IN NS example.test.qqq.
+                       IN A 192.168.0.1
+                       IN MX 10 mail.example.test.qqq.
+example.test.qqq.      IN A 192.168.0.1
+mail.example.test.qqq. IN A 192.168.0.1
+www                    CNAME example.test.qqq.

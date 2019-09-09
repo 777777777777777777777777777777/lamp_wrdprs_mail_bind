@@ -1,0 +1,17 @@
+---
+# defaults file for apache_nginx_php_phpmyadmin
+nginx_d: /etc/nginx
+nginx_conf_d: /etc/nginx/conf.d
+
+httpd_d: /etc/httpd/conf
+httpd_conf_d: /etc/httpd/conf.d
+
+www: /var/www/html
+
+www_wordpress: /var/www/html/wordpress
+
+phpmyadmin_conf: /etc/phpMyAdmin/config.inc.php
+
+phpmyadmin_vendor: /var/www/html/wordpress/phpMyAdmin/libraries/vendor_config.php
+
+opt_php_d: /opt/remi/php56/root/etc/php.d

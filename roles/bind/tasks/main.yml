@@ -1,0 +1,20 @@
+---
+# tasks file for bind
+
+- name: install bind
+  yum: name=bind.x86_64 state=installed
+
+- name: copy named.conf
+  copy: src=named.conf dest={{ etc_d }}
+
+- name: copy zone
+  copy: src=example.test.qqq dest={{ named_d }}
+
+- name: copy reverce zone
+  copy: src=192.168.0.0 dest={{ named_d }}
+
+- name: start bind
+  command: /etc/init.d/named start
+
+- name: Enable bind
+  command: /sbin/chkconfig named on

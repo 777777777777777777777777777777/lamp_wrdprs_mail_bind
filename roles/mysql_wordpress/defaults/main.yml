@@ -1,0 +1,15 @@
+---
+# defaults file for mysql_wordpress
+mysql_root_password: 87654321
+mysql_dbname: superdb
+mysql_dbuser: userdb
+mysql_dbpass: 88888888
+
+auto_up_disable: false
+core_update_level: true
+
+wordpress_user_password: $6$U7/FhCFjzvdqaTPh$Oga0n4HpN6K/O0VrLLeJBD3IsYTWyHLAOijQFXwaw5vQuyIzbhN.1dbD5nIbLGHV4IFgm9TTcJO.u8RhOPw7L1
+#user_password is qweasdzxc
+#password generate by
+#mkpasswd --method=sha-512
+

@@ -1,0 +1,13 @@
+---
+# handlers file for sendmail_dovecot
+- name: Reconfigure sendmail
+  shell: m4 "{{ sendmail_d }}/sendmail.mc" > "{{ sendmail_d }}/sendmail.cf"
+
+- name: Start sendmail
+  service: name=sendmail state=started
+
+#- name: Start saslauthd
+#  service: name=saslauthd state=started
+
+- name: Start dovecot
+  service: name=dovecot state=started

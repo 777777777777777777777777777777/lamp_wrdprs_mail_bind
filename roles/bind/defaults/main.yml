@@ -1,0 +1,4 @@
+---
+# defaults file for bind
+named_d: /var/named
+etc_d: /etc

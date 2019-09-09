@@ -1,0 +1,6 @@
+---
+# defaults file for sendmail_dovecot
+
+sendmail_d: /etc/mail
+dovecot: /etc/dovecot
+dovecot_d: /etc/dovecot/conf.d

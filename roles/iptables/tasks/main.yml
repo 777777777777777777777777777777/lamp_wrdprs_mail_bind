@@ -1,0 +1,15 @@
+---
+# tasks file for iptables
+
+- name: copy iptables
+  copy: src=iptables dest={{ iptables_d }}
+
+- name: restart iptables
+  command: service iptables restart
+  ignore_errors: True
+
+- name: enable php56-php-fpm
+  command:/sbin/chkconfig php56-php-fpm on
+
+- name: enable htcacheclean
+  command:/sbin/chkconfig htcacheclean on

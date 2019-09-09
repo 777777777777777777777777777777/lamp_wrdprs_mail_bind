@@ -1,0 +1,76 @@
+---
+# tasks file for sendmail_dovecot
+
+################################
+############# Sendmail ###########
+#############################
+
+- name: install sendmail and requireds
+  yum: name={{ item }}
+       state=installed
+  with_items:
+   - sendmail
+   - sendmail-cf
+   - m4
+   - cyrus-sasl
+   - hesiod
+   - procmail
+
+- name: copy sendmail.mc
+  copy: src=sendmail.mc dest={{ sendmail_d }}
+
+
+- name: copy hostname
+  copy: src=hostname dest=/etc/
+
+- name: copy hosts
+  copy: src=hosts dest=/etc/
+
+- name: copy virtusertable
+  copy: src=virtusertable dest={{ sendmail_d }}
+
+- name: copy local-host-names
+  copy: src=local-host-names dest={{ sendmail_d }}
+
+
+- name: Reconfigure sendmail
+  command: m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf
+  ignore_errors: True
+
+- name: Start sendmail
+  command: service sendmail start
+
+- name: Enable sendmail
+  command: /sbin/chkconfig sendmail on
+
+###################################
+################ Dovecot ##############
+#####################################
+
+- name: install dovecot
+  yum: name=dovecot state=installed
+
+- name: copy dovecot.conf
+  copy: src=dovecot.conf dest={{ dovecot }}
+
+- name: copy auth.conf
+  copy: src=10-auth.conf dest={{ dovecot_d }}
+
+- name: copy mail.conf
+  copy: src=10-mail.conf dest={{ dovecot_d }}
+
+- name: copy pop3.conf
+  copy: src=20-pop3.conf dest={{ dovecot_d }}
+
+- name: copy master.conf
+  copy: src=10-master.conf dest={{ dovecot_d }}
+
+- name: copy ssl.conf
+  copy: src=10-ssl.conf dest={{ dovecot_d }}
+
+- name: Sart dovecot
+  command: service dovecot start
+
+- name: Enable dovecot
+  command: /sbin/chkconfig dovecot on
+
